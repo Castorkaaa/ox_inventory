@@ -34,7 +34,8 @@ return {
 		owner = false,
 		slots = 70,
 		weight = 70000,
-		groups = {['gangsters'] = 0}
+		groups = {['gangsters'] = 0},
+		webhook = 'https://discord.com/api/webhooks/YOUR_WEBHOOK_URL_HERE'
 	},
 
 	{
