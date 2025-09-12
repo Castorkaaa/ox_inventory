@@ -1,65 +1,178 @@
-# ox_inventory
+# OX Inventory Discord Logger
 
-A complete inventory system for FiveM, implementing items, weapons, shops, and more without any strict framework dependency.
+Ez egy önálló FiveM script, ami részletes Discord webhook logolást biztosít az ox_inventory rendszerhez.
 
-![](https://img.shields.io/github/downloads/overextended/ox_inventory/total?logo=github)
-![](https://img.shields.io/github/downloads/overextended/ox_inventory/latest/total?logo=github)
-![](https://img.shields.io/github/contributors/overextended/ox_inventory?logo=github)
-![](https://img.shields.io/github/v/release/overextended/ox_inventory?logo=github)
+## 🚀 Telepítés
 
-## 📚 Documentation
+1. Töltsd le vagy másold a script fájlokat a `resources/ox_inventory_logger` mappába
+2. Add hozzá a `server.cfg`-hez: `ensure ox_inventory_logger`
+3. Konfiguráld a webhook URL-eket (lásd alább)
+4. Indítsd újra a servert
 
-https://overextended.dev/ox_inventory
+## ⚙️ Konfiguráció
 
-## 💾 Download
+### Server.cfg beállítások
 
-https://github.com/overextended/ox_inventory/releases/latest/download/ox_inventory.zip
+```cfg
+# Alapértelmezett webhook URL-ek
+set inventory_logger:webhook:give "https://discord.com/api/webhooks/YOUR_GIVE_WEBHOOK"
+set inventory_logger:webhook:crafting "https://discord.com/api/webhooks/YOUR_CRAFTING_WEBHOOK"
+set inventory_logger:webhook:evidence "https://discord.com/api/webhooks/YOUR_EVIDENCE_WEBHOOK"
+set inventory_logger:webhook:shop "https://discord.com/api/webhooks/YOUR_SHOP_WEBHOOK"
+set inventory_logger:webhook:vehicle "https://discord.com/api/webhooks/YOUR_VEHICLE_WEBHOOK"
+set inventory_logger:webhook:stash "https://discord.com/api/webhooks/YOUR_DEFAULT_STASH_WEBHOOK"
 
-## Supported frameworks
+# Opcionális beállítások
+set inventory_logger:webhook:use "https://discord.com/api/webhooks/YOUR_USE_WEBHOOK"
+set inventory_logger:log_item_use 0
+set inventory_logger:debug 0
+```
 
-We do not guarantee compatibility or support for third-party resources.
+### Stash-specifikus webhookok
 
-- [ox_core](https://github.com/overextended/ox_core)
-- [esx](https://github.com/esx-framework/esx_core)
-- [qbox](https://github.com/Qbox-project/qbx_core)
-- [nd_core](https://github.com/ND-Framework/ND_Core)
+Az ox_inventory `data/stashes.lua` fájljában minden stash-hez külön webhook URL-t adhatsz meg:
 
-## ✨ Features
+```lua
+{
+    coords = vec3(301.3, -600.23, 43.28),
+    target = {
+        loc = vec3(301.82, -600.99, 43.29),
+        length = 0.6,
+        width = 1.8,
+        heading = 340,
+        minZ = 43.34,
+        maxZ = 44.74,
+        label = 'Open stash'
+    },
+    name = 'gangstash',
+    label = 'Gang Stash',
+    owner = false,
+    slots = 70,
+    weight = 70000,
+    groups = {['gangsters'] = 0},
+    webhook = 'https://discord.com/api/webhooks/YOUR_GANG_SPECIFIC_WEBHOOK'
+},
+```
 
-- Server-side security ensures interactions with items, shops, and stashes are all validated.
-- Logging for important events, such as purchases, item movement, and item creation or removal.
-- Supports player-owned vehicles, licenses, and group systems implemented by frameworks.
-- Fully synchronised, allowing multiple players to [access the same inventory](https://user-images.githubusercontent.com/65407488/230926091-c0033732-d293-48c9-9d62-6f6ae0a8a488.mp4).
+## 📋 Logolt Események
 
-### Items
+### 📤 Item Átadás
+- Játékos neve és azonosítói (átadó és átvevő)
+- Item részletek (név, mennyiség, súly, metadata)
+- Időbélyeg
 
-- Inventory items are stored per-slot, with customisable metadata to support item uniqueness.
-- Overrides default weapon-system with weapons as items.
-- Weapon attachments and ammo system, including special ammo types.
-- Durability, allowing items to be depleted or removed overtime.
-- Internal item system provides secure and easy handling for item use effects.
-- Compatibility with 3rd party framework item registration.
+### 🔨 Kraftolás
+- Játékos információk
+- Munkaszék azonosító
+- Elkészített item részletek
+- Felhasznált alapanyagok listája
 
-### Shops
+### 🚔 Bizonyítékraktár
+- Rendőr információk
+- Bizonyítékraktár azonosító
+- Item részletek
+- Művelet típusa (hozzáadás/eltávolítás)
 
-- Restricted access based on groups and licenses.
-- Support different currency for items (black money, poker chips, etc).
+### 🛒 Bolt Vásárlás
+- Vásárló információk
+- Bolt típusa
+- Vásárolt item részletek
+- Ár és valuta
 
-### Stashes
+### 🚗 Jármű Tároló
+- Játékos információk
+- Jármű rendszám
+- Tároló típusa (csomagtartó/kesztyűtartó)
+- Item részletek
+- Művelet típusa
 
-- Personal stashes, linking a stash with a specific identifier or creating per-player instances.
-- Restricted access based on groups.
-- Registration of new stashes from any resource.
-- Containers allow access to stashes when using an item, like a paperbag or backpack.
-- Access gloveboxes and trunks for any vehicle.
-- Random item generation inside dumpsters and unowned vehicles.
+### 📦 Stash/Tároló
+- Játékos információk
+- Stash név és címke
+- Item részletek
+- Művelet típusa
+- **Egyedi webhook URL minden stash-hez!**
 
-## Copyright
+### 🎯 Item Használat (Opcionális)
+- Játékos információk
+- Használt item részletek
+- Slot információ
 
-Copyright © 2024 Overextended <https://github.com/overextended>
+## 🛠️ Parancsok
 
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+### Console parancsok:
+- `reloadstashwebhooks` - Stash webhookok újratöltése
+- `testlogger [típus]` - Test webhook küldése (give/shop/stash)
 
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+## 🔧 Exportok
 
-You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+Más scriptek is használhatják a logger funkciókat:
+
+```lua
+-- Átadás logolása
+exports.ox_inventory_logger:logGive(source, target, item, count)
+
+-- Kraftolás logolása  
+exports.ox_inventory_logger:logCrafting(source, benchId, recipe, item, count)
+
+-- Bizonyítékraktár logolása
+exports.ox_inventory_logger:logEvidence(source, action, item, count, evidenceId)
+
+-- Bolt logolása
+exports.ox_inventory_logger:logShop(source, shopType, item, count, price, currency)
+
+-- Jármű logolása
+exports.ox_inventory_logger:logVehicle(source, action, vehicleType, plate, item, count)
+
+-- Stash logolása
+exports.ox_inventory_logger:logStash(source, action, stashName, stashLabel, item, count)
+
+-- Stash webhookok újratöltése
+exports.ox_inventory_logger:loadStashWebhooks()
+```
+
+## 🎨 Testreszabás
+
+A `config.lua` fájlban módosíthatod:
+- Webhook URL-eket
+- Színeket
+- Logolási beállításokat
+- Kizárt itemeket
+- Debug módot
+
+## 🐛 Hibaelhárítás
+
+1. **Webhookok nem működnek:**
+   - Ellenőrizd a webhook URL-eket
+   - Kapcsold be a debug módot: `set inventory_logger:debug 1`
+   - Nézd a server konzolt
+
+2. **Hookök nem regisztrálódnak:**
+   - Győződj meg róla, hogy az ox_inventory fut
+   - Ellenőrizd az ox_inventory verzióját
+   - Nézd a console üzeneteket
+
+3. **Stash webhookok nem működnek:**
+   - Futtasd a `reloadstashwebhooks` parancsot
+   - Ellenőrizd a stash konfigurációt
+
+## 📝 Changelog
+
+### v1.0.0
+- Kezdeti verzió
+- Minden alapvető inventory művelet logolása
+- Stash-specifikus webhookok támogatása
+- Részletes Discord embedek
+- Debug mód és hibaelhárítás
+
+## 🤝 Támogatás
+
+Ha problémád van a scripttel, ellenőrizd:
+1. Az ox_inventory megfelelően fut-e
+2. A webhook URL-ek helyesek-e
+3. A debug mód mit ír ki
+4. A server console hibaüzeneteit
+
+## 📄 Licenc
+
+Ez a script szabadon használható és módosítható.
