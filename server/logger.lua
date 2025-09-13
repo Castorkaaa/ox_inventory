@@ -4,25 +4,26 @@ local Logger = {}
 
 -- Játékos információk lekérése
 local function getPlayerInfo(source)
-    local player = exports.ox_inventory:GetPlayerFromId and exports.ox_inventory:GetPlayerFromId(source)
+    local player = nil
     
-    if not player then
-        -- Fallback más frameworkökre
-        if GetResourceState('es_extended') == 'started' then
-            player = exports.es_extended:getSharedObject().GetPlayerFromId(source)
-        elseif GetResourceState('qbx_core') == 'started' then
-            player = exports.qbx_core:GetPlayer(source)
-        elseif GetResourceState('ox_core') == 'started' then
-            player = exports.ox_core:GetPlayer(source)
-        end
+    -- Próbáljuk meg lekérni a játékos adatokat különböző frameworkökből
+    if GetResourceState('es_extended') == 'started' then
+        local ESX = exports.es_extended:getSharedObject()
+        player = ESX.GetPlayerFromId(source)
+    elseif GetResourceState('qbx_core') == 'started' then
+        player = exports.qbx_core:GetPlayer(source)
+    elseif GetResourceState('ox_core') == 'started' then
+        player = exports.ox_core:GetPlayer(source)
+    elseif GetResourceState('ND_Core') == 'started' then
+        player = exports.ND_Core:getPlayer(source)
     end
     
     if not player then 
         return GetPlayerName(source) or 'Ismeretlen játékos', 'N/A' 
     end
     
-    local name = player.name or player.getName and player.getName() or GetPlayerName(source)
-    local identifier = player.identifier or player.citizenid or player.charid or 'N/A'
+    local name = player.name or (player.getName and player.getName()) or GetPlayerName(source)
+    local identifier = player.identifier or player.citizenid or player.charid or player.id or 'N/A'
     
     return name, tostring(identifier)
 end
@@ -437,7 +438,7 @@ function Logger.loadStashWebhooks()
     
     -- Próbáljuk betölteni a stash konfigurációt
     local success, stashes = pcall(function()
-        return exports.ox_inventory and exports.ox_inventory:GetStashes() or {}
+        return lib.load('data.stashes') or {}
     end)
     
     if not success then
